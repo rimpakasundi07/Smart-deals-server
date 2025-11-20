@@ -1,0 +1,76 @@
+const express = require("express");
+const cors = require("cors");
+const app = express();
+const { MongoClient, ServerApiVersion } = require("mongodb");
+const port = process.env.PORT || 3000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// smartdbUser
+// password: VuqPU32Z4DueSIEu
+const uri =
+  "mongodb+srv://smartdbUser:VuqPU32Z4DueSIEu@cluster0.obgikox.mongodb.net/?appName=Cluster0";
+
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+});
+async function run() {
+  try {
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+}
+run().catch(console.dir);
+
+app.get("/", (req, res) => {
+  res.send("Smart server is running");
+});
+
+async function run() {
+  try {
+    await client.connect();
+
+    const db = client.db("smart_db");
+    const productsCollection = db.collection("products");
+
+    app.post("/products", async (req, res) => {
+      const newProduct = req.body;
+      const result = await productsCollection.insertOne(newProduct);
+      res.send(result);
+    });
+
+    await client.db("admin").command({ ping: 1 });
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
+  } finally {
+  }
+}
+run().catch(console.dir);
+
+app.listen(port, () => {
+  console.log(`Smart server is running on port: ${port} `);
+});
+
+// client
+//   .connect()
+//   .then(() => {
+//     app.listen(port, () => {
+//       console.log(`Smart server is running now on port: ${port} `);
+//     });
+//   })
+//   .catch(console.dir);
