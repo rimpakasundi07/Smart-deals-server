@@ -334,6 +334,13 @@ async function run() {
       res.send(result);
     });
 
+    app.delete("/bids/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await bidsCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // Ping for connection confirmation
     await client.db("admin").command({ ping: 1 });
 
