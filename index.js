@@ -175,17 +175,20 @@
 
 const express = require("express");
 const cors = require("cors");
+require("dotenv").config();
 const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 3000;
+console.log(process.env);
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
-const uri =
-  "mongodb+srv://smartdbUser:VuqPU32Z4DueSIEu@cluster0.obgikox.mongodb.net/?appName=Cluster0";
+
+const uri = `const uri =
+  "mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.obgikox.mongodb.net/?appName=Cluster0";`;
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -314,16 +317,6 @@ async function run() {
       const productId = req.params.productId;
       const query = { product: productId };
       const cursor = bidsCollection.find(query).sort({ bid_price: -1 });
-      const result = await cursor.toArray();
-      res.send(result);
-    });
-
-    app.get("/bids", async (req, res) => {
-      const query = {};
-      if (query.email) {
-        query.buyer_email = email;
-      }
-      const cursor = bidsCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
     });
