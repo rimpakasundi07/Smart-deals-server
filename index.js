@@ -19,7 +19,14 @@ const verifyFireBaseToken = (req, res, next) => {
   console.log("in the verify middleware", req.headers.authorization);
   if (!req.headers.authorization) {
     // do not allow to go
+    return res.status(401).send({ message: "unauthorized access" });
   }
+  const token = req.headers.authorization.split("")[1];
+  if (!token) {
+    return res.status(401).send({ message: "unauthorized access" });
+  }
+
+  // verify token
 
   //
   next();
