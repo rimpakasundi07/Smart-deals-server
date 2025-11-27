@@ -4,7 +4,14 @@ require("dotenv").config();
 const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 3000;
-console.log(process.env);
+const admin = require("firebase-admin");
+//console.log(process.env);
+
+const serviceAccount = require("./smart-deals-firebase-admin-key.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 // Middleware
 app.use(cors());
@@ -21,12 +28,12 @@ const verifyFireBaseToken = (req, res, next) => {
     // do not allow to go
     return res.status(401).send({ message: "unauthorized access" });
   }
-  const token = req.headers.authorization.split("")[1];
+  const token = req.headers.authorization.split(" ")[1];
   if (!token) {
     return res.status(401).send({ message: "unauthorized access" });
   }
 
-  // verify token
+  // verify id  token
 
   //
   next();
