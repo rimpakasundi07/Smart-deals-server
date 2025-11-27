@@ -35,6 +35,7 @@ const verifyFireBaseToken = async (req, res, next) => {
 
   try {
     const userInfo = await admin.auth().verifyIdToken(token);
+    req.token_email = userInfo.email;
     console.log("after token validation", userInfo);
     next();
   } catch {
@@ -162,14 +163,19 @@ async function run() {
     });
 
     // --------------------
-    // Bids API
+    // Bids related API
     // --------------------
     app.get("/bids", logger, verifyFireBaseToken, async (req, res) => {
-      // console.log("headers", req.headers);
+      console.log("headers", req);
       const email = req.query.email;
       const query = {};
 
-      if (email) query.buyer_email = email;
+      if (email) {
+        if (email !== req.token_email) {
+          return res.status(403).send({ message: "forbidd access " });
+        }
+        query.buyer_email = email;
+      }
 
       const result = await bidsCollection.find(query).toArray();
       res.send(result);
