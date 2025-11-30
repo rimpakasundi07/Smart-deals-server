@@ -10,6 +10,13 @@ const admin = require("firebase-admin");
 
 const serviceAccount = require("./smart-deals-firebase-admin-key.json");
 
+// index.js
+// const decoded = Buffer.from(
+//   process.env.FIREBASE_SERVICE_KEY,
+//   "base64"
+// ).toString("utf8");
+// const serviceAccount = JSON.parse(decoded);
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -139,7 +146,8 @@ async function run() {
     });
 
     // Add product
-    app.post("/products", async (req, res) => {
+    app.post("/products", verifyFireBaseToken, async (req, res) => {
+      console.log("headers in the post", req.headers);
       const newProduct = req.body;
       const result = await productsCollection.insertOne(newProduct);
       res.send(result);
@@ -173,10 +181,10 @@ async function run() {
     });
 
     // --------------------
-    // Bids related API
+    // Bids related API with firebase token verify
     // --------------------
     app.get("/bids", logger, verifyFireBaseToken, async (req, res) => {
-      console.log("headers", req);
+      console.log("headers", req.headers);
       const email = req.query.email;
       const query = {};
 
@@ -217,7 +225,8 @@ async function run() {
     });
 
     // Ping for connection confirmation
-    await client.db("admin").command({ ping: 1 });
+
+    // await client.db("admin").command({ ping: 1 });
 
     console.log("Pinged MongoDB! Database is ready.");
     app.listen(port, () => {
